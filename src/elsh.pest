@@ -1,0 +1,20 @@
+program = { SOI ~ (stmt ~ (newline)*)+ ~ eoi }
+
+eoi = _{ !ANY }
+
+newline = _{ ";"{1} | NEWLINE }
+
+stmt = _{
+    assignExpr
+    | CommentExpr
+}
+
+ident = @{ ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_")* }
+string = @{ "'" ~ ( "''" | (!"'" ~ ANY) )* ~ "'" }
+float = @{ ASCII_DIGIT* ~ "." ~ ASCII_DIGIT* }
+integer = @{ ASCII_DIGIT* }
+variable_possibilites = _{ string | float | integer }
+
+assignExpr = { ident ~ "=" ~ variable_possibilites }
+
+CommentExpr = _{ "#" ~ (!NEWLINE ~ ANY)* ~ NEWLINE }
