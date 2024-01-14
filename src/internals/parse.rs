@@ -28,6 +28,7 @@ pub fn parse_file(path: impl Into<PathBuf> + std::convert::AsRef<std::path::Path
                 let copy = inner_rules.clone();
                 let variable_name = inner_rules.next().unwrap().as_str();
                 let variable_contents = inner_rules.peek().unwrap().as_str();
+                dbg!("{:?}", &copy);
                 let variable_type = match inner_rules.next().unwrap().as_rule() {
                     Rule::integer => Type::Integer(variable_contents.parse().unwrap()),
                     Rule::float => Type::Float(variable_contents.parse().unwrap()),
@@ -52,13 +53,13 @@ fn parse_array(lines: Pairs<'_, Rule>) -> Type {
     let mut fucking_stupid_vector: Vec<Type> = Vec::new();
     for line in lines {
         match line.as_rule() {
-            Rule::array => {
-                for fucking_stupid_shit in line.into_inner().into_iter() {
-                    fucking_stupid_vector.push(parse_value(fucking_stupid_shit));
-                }
+            Rule::array | Rule::string | Rule::integer | Rule::float => {
+                fucking_stupid_vector.push(parse_value(line));
             }
             Rule::ident => continue,
-            _ => unimplemented!("Fuck you"),
+            _ => unreachable!(
+                "Somewhere someone made arrays take in non array/variable values. Shame them."
+            ),
         };
     }
     Type::Array(fucking_stupid_vector)
