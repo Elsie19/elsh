@@ -6,14 +6,15 @@ newline = _{ ";"{1} | NEWLINE }
 
 stmt = _{
     assignExpr
-    | CommentExpr
+  | CommentExpr
 }
 
-ident = @{ ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_")* }
-string = @{ "'" ~ ( "''" | (!"'" ~ ANY) )* ~ "'" }
-float = @{ ASCII_DIGIT* ~ "." ~ ASCII_DIGIT* }
-integer = @{ ASCII_DIGIT* }
-variable_possibilites = _{ string | float | integer }
+ident                 = @{ ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_")* }
+string                = @{ "'" ~ ("''" | (!"'" ~ ANY))* ~ "'" }
+float                 = @{ ASCII_DIGIT* ~ "." ~ ASCII_DIGIT* }
+integer               = @{ ASCII_DIGIT* }
+array                 = ${ "[" ~ (!"]" ~ variable_possibilites ~ ("," ~ variable_possibilites)*)? ~ "]" }
+variable_possibilites = _{ array | string | float | integer }
 
 assignExpr = { ident ~ "=" ~ variable_possibilites }
 

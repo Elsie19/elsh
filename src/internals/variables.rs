@@ -1,11 +1,13 @@
-use core::fmt;
 use std::collections::HashMap;
+
+use pest::iterators::Pairs;
 
 #[derive(Debug)]
 pub enum Type {
     String(String),
     Integer(i32),
     Float(f32),
+    Array(Vec<Type>),
 }
 
 #[derive(Debug)]
@@ -16,8 +18,10 @@ pub struct Variables {
 
 impl Variables {
     pub fn new() -> Self {
-        let mut setup = Variables { vars: HashMap::new() };
-        setup.set("ELSH_VERSION", Type::String(String::from("0.0.1")));
+        let mut setup = Variables {
+            vars: HashMap::new(),
+        };
+        setup.set("ELSH_VERSION", Type::String("0.0.1".to_string()));
         setup
     }
 

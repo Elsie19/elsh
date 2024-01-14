@@ -1,1 +1,3 @@
-pub mod variables;
+pub mod internals {
+    pub mod variables;
+}

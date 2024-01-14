@@ -1,5 +1,6 @@
 # foobar
-florp='ba'
-foo='bar'
-float=1.2
-integer=1
+# florp='ba'
+# foo='bar'
+# float=1.2
+# integer=1
+array=[1,'2']

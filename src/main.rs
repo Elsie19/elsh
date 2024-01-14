@@ -1,7 +1,8 @@
+use elsh::internals::variables::{Type, Variables};
+use elsh::internals::parse;
 use pest::Parser;
 use pest_derive::Parser;
 use std::fs;
-use elsh::variables::{Variables, Type};
 
 #[derive(Parser)]
 #[grammar = "elsh.pest"]
@@ -16,17 +17,20 @@ fn main() {
         .unwrap();
 
     let mut elsh_variables = Variables::new();
-    
+
+    dbg!("{}", &file);
+
     for line in file.into_inner() {
         match line.as_rule() {
             Rule::assignExpr => {
-                let mut inner_rules = line.into_inner(); // { name }
-                let variable_name = inner_rules.next().unwrap().as_str(); // { name }
+                let mut inner_rules = line.into_inner();
+                let variable_name = inner_rules.next().unwrap().as_str();
                 let variable_contents = inner_rules.peek().unwrap().as_str();
                 let variable_type = match inner_rules.next().unwrap().as_rule() {
                     Rule::integer => Type::Integer(variable_contents.parse().unwrap()),
                     Rule::float => Type::Float(variable_contents.parse().unwrap()),
                     Rule::string => Type::String(variable_contents.parse().unwrap()),
+                    Rule::array => ,
                     _ => unreachable!("Somewhere someone made 'Rule::assignExpr' take in non variable values. Shame on them."),
                 };
                 elsh_variables.set(&variable_name, variable_type);
@@ -38,5 +42,4 @@ fn main() {
             _ => unreachable!("{:?}", line.as_rule()),
         }
     }
-    println!("{}", elsh_variables.get("florp"));
 }
