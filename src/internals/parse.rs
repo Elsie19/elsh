@@ -1,4 +1,6 @@
-use super::variables::{Type, Variables};
+use crate::internals::variables::VariableStatus;
+
+use super::variables::{ElshLvl, ExportStatus, Type, Variable, Variables};
 use pest::iterators::{Pair, Pairs};
 use pest::Parser;
 use pest_derive::Parser;
@@ -26,7 +28,15 @@ pub fn parse_file(path: impl Into<PathBuf> + std::convert::AsRef<std::path::Path
                 let variable_name = inner_rules.next().unwrap().as_str();
                 let variable_contents = inner_rules.next().unwrap();
                 let variable_type = parse_value(variable_contents);
-                elsh_variables.set(&variable_name, variable_type);
+                elsh_variables.set(
+                    &variable_name,
+                    Variable {
+                        var_type: variable_type,
+                        var_status: VariableStatus { readonly: false },
+                        var_export_status: ExportStatus::Normal,
+                        var_lvl: ElshLvl(1),
+                    },
+                );
             }
             Rule::eoi => println!("{}", "Finished parsing"),
             Rule::newline | Rule::ident | Rule::string => continue,

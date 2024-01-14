@@ -9,9 +9,33 @@ pub enum Type {
 }
 
 #[derive(Debug)]
+pub struct VariableStatus {
+    pub readonly: bool,
+}
+
+#[derive(Debug)]
+pub enum ExportStatus {
+    Global,
+    Local,
+    Normal,
+    Declared,
+}
+
+#[derive(Debug)]
+pub struct ElshLvl(pub i32);
+
+#[derive(Debug)]
+pub struct Variable {
+    pub var_type: Type,
+    pub var_status: VariableStatus,
+    pub var_export_status: ExportStatus,
+    pub var_lvl: ElshLvl,
+}
+
+#[derive(Debug)]
 pub struct Variables {
     /// First String is the variable name, second is the type
-    vars: HashMap<String, Type>,
+    vars: HashMap<String, Variable>,
     shopts: HashMap<String, bool>,
 }
 
@@ -21,11 +45,19 @@ impl Variables {
             vars: HashMap::new(),
             shopts: HashMap::new(),
         };
-        setup.set("ELSH_VERSION", Type::String("0.0.1".to_string()));
+        setup.set(
+            "ELSH_VERSION",
+            Variable {
+                var_type: Type::String("0.0.1".to_string()),
+                var_status: VariableStatus { readonly: true },
+                var_export_status: ExportStatus::Global,
+                var_lvl: ElshLvl(0),
+            },
+        );
         setup
     }
 
-    pub fn set(&mut self, key: &str, value: Type) {
+    pub fn set(&mut self, key: &str, value: Variable) {
         if self.vars.contains_key(&key.to_string()) {
             *self.vars.get_mut(&key.to_string()).unwrap() = value;
         } else {
@@ -45,7 +77,7 @@ impl Variables {
         self.vars.remove(&key);
     }
 
-    pub fn get(&mut self, key: &str) -> Option<&Type> {
+    pub fn get(&mut self, key: &str) -> Option<&Variable> {
         self.vars.get(key)
     }
 }
