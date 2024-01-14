@@ -54,7 +54,7 @@ fn parse_array(lines: Pairs<'_, Rule>) -> Type {
             Rule::array | Rule::string | Rule::integer | Rule::float => {
                 fucking_stupid_vector.push(parse_value(line));
             }
-            _ => unimplemented!("Fuck you"),
+            _ => unreachable!("Fuck you"),
         };
     }
     Type::Array(fucking_stupid_vector)
