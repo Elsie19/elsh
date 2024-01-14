@@ -2,5 +2,5 @@
 # florp='ba'
 # foo='bar'
 # float=1.2
-integer=1 # foo
+integer=1
 array=[1,'2',['foo','bar']]

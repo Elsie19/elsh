@@ -19,29 +19,17 @@ pub fn parse_file(path: impl Into<PathBuf> + std::convert::AsRef<std::path::Path
 
     let mut elsh_variables = Variables::new();
 
-    // dbg!("{}", &file);
-
     for line in file.into_inner() {
         match line.as_rule() {
             Rule::assignExpr => {
                 let mut inner_rules = line.into_inner();
-                let copy = inner_rules.clone();
                 let variable_name = inner_rules.next().unwrap().as_str();
-                let variable_contents = inner_rules.peek().unwrap().as_str();
-                dbg!("{:?}", &copy);
-                let variable_type = match inner_rules.next().unwrap().as_rule() {
-                    Rule::integer => Type::Integer(variable_contents.parse().unwrap()),
-                    Rule::float => Type::Float(variable_contents.parse().unwrap()),
-                    Rule::string => Type::String(variable_contents.parse().unwrap()),
-                    Rule::array => parse_array(copy),
-                    _ => unreachable!("Somewhere someone made 'Rule::assignExpr' take in non variable values. Shame on them."),
-                };
+                let variable_contents = inner_rules.next().unwrap();
+                let variable_type = parse_value(variable_contents);
                 elsh_variables.set(&variable_name, variable_type);
             }
             Rule::eoi => println!("{}", "Finished parsing"),
-            Rule::newline => continue,
-            Rule::ident => continue,
-            Rule::string => continue,
+            Rule::newline | Rule::ident | Rule::string => continue,
             _ => unreachable!("{:?}", line.as_rule()),
         }
     }
@@ -56,10 +44,7 @@ fn parse_array(lines: Pairs<'_, Rule>) -> Type {
             Rule::array | Rule::string | Rule::integer | Rule::float => {
                 fucking_stupid_vector.push(parse_value(line));
             }
-            Rule::ident => continue,
-            _ => unreachable!(
-                "Somewhere someone made arrays take in non array/variable values. Shame them."
-            ),
+            _ => unimplemented!("Fuck you"),
         };
     }
     Type::Array(fucking_stupid_vector)
