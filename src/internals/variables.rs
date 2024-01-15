@@ -70,6 +70,24 @@ impl Variables {
                 var_lvl: ElshLvl(0),
             },
         );
+        setup.set(
+            "PATH",
+            Variable {
+                var_type: Type::Array(vec![
+                    Type::String("/usr/local/sbin".to_string()),
+                    Type::String("/usr/local/bin".to_string()),
+                    Type::String("/usr/sbin".to_string()),
+                    Type::String("/usr/bin".to_string()),
+                    Type::String("/bin".to_string()),
+                    Type::String("/sbin".to_string()),
+                    Type::String("/usr/games".to_string()),
+                    Type::String("/usr/local/games".to_string()),
+                ]),
+                var_status: VariableStatus { readonly: false },
+                var_export_status: ExportStatus::Global,
+                var_lvl: ElshLvl(0),
+            },
+        );
         setup
     }
 

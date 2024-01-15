@@ -40,7 +40,7 @@ pub fn parse_file(path: impl Into<PathBuf> + std::convert::AsRef<std::path::Path
             }
             Rule::eoi => println!("{}", "Finished parsing"),
             Rule::newline | Rule::ident | Rule::string => continue,
-            _ => unreachable!("{:?}", line.as_rule()),
+            _ => todo!("commands to be run {:?}", line.as_rule()),
         }
     }
 
