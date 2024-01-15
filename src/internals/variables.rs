@@ -1,3 +1,4 @@
+use core::fmt;
 use std::collections::HashMap;
 
 #[derive(Debug)]
@@ -39,6 +40,17 @@ pub struct Variables {
     shopts: HashMap<String, bool>,
 }
 
+impl fmt::Display for Type {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::String(val) => write!(f, "{}", val.to_string()),
+            Self::Integer(val) => write!(f, "{}", val.to_string()),
+            Self::Float(val) => write!(f, "{}", val.to_string()),
+            Self::Array(val) => write!(f, "{:?}", val),
+        }
+    }
+}
+
 impl Variables {
     pub fn new() -> Self {
         let mut setup = Variables {
@@ -77,7 +89,7 @@ impl Variables {
         self.vars.remove(&key);
     }
 
-    pub fn get(&mut self, key: &str) -> Option<&Variable> {
+    pub fn get(&self, key: &str) -> Option<&Variable> {
         self.vars.get(key)
     }
 }

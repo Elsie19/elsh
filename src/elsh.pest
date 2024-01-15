@@ -1,4 +1,5 @@
-program = { SOI ~ (stmt ~ (newline)*)+ ~ eoi }
+COMMENT = _{ "#" ~ (!NEWLINE ~ ANY)* ~ NEWLINE }
+program =  { SOI ~ (stmt ~ (newline)*)+ ~ eoi }
 
 eoi = _{ !ANY }
 
@@ -6,16 +7,16 @@ newline = _{ ";"{1} | NEWLINE }
 
 stmt = _{
     assignExpr
-  | CommentExpr
 }
 
-ident                 = @{ ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_")* }
-string                = @{ "'" ~ ("''" | (!"'" ~ ANY))* ~ "'" }
-float                 = @{ ASCII_DIGIT* ~ "." ~ ASCII_DIGIT* }
-integer               = @{ ASCII_DIGIT* }
-array                 = ${ "[" ~ (!"]" ~ variable_possibilites ~ ("," ~ variable_possibilites)*)? ~ "]" }
-variable_possibilites = _{ array | string | float | integer }
+ident                  = @{ ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_")* }
+variable_interpolation = @{ "${" ~ ident ~ "}" }
+singlequotes           =  { "'" ~ ("''" | (!"'" ~ ANY))* ~ "'" }
+doublequotes           =  { "\"" ~ ("\"\"" | (!"\"" ~ ANY))* ~ "\"" }
+string                 = _{ singlequotes | doublequotes }
+float                  = @{ ASCII_DIGIT* ~ "." ~ ASCII_DIGIT* }
+integer                = @{ ASCII_DIGIT* }
+array                  = ${ "[" ~ (!"]" ~ variable_possibilites ~ ("," ~ variable_possibilites)*)? ~ "]" }
+variable_possibilites  = _{ array | string | float | integer }
 
 assignExpr = { ident ~ "=" ~ variable_possibilites }
-
-CommentExpr = _{ "#" ~ (!NEWLINE ~ ANY)* ~ NEWLINE }
