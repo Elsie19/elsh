@@ -5,3 +5,4 @@ float=1.2
 integer=1
 foo="ugh{float}"
 array=[1,'2',['foo','bar']]
+bar="-- {array} --"

@@ -46,7 +46,11 @@ impl fmt::Display for Type {
             Self::String(val) => write!(f, "{}", val.to_string()),
             Self::Integer(val) => write!(f, "{}", val.to_string()),
             Self::Float(val) => write!(f, "{}", val.to_string()),
-            Self::Array(val) => write!(f, "{:?}", val),
+            Self::Array(val) => {
+                let array_str_vec: Vec<String> =
+                    val.iter().map(|x| x.to_string()).collect::<Vec<String>>();
+                write!(f, "{:?}", &array_str_vec)
+            }
         }
     }
 }
