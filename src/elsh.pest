@@ -7,6 +7,7 @@ newline = _{ ";"{1} | NEWLINE }
 
 stmt = _{
     assignExpr
+  | updateVariableExpr
   | functionCallExpr
 }
 
@@ -19,5 +20,6 @@ integer               = @{ ASCII_DIGIT* }
 array                 = ${ "[" ~ (!"]" ~ variable_possibilites ~ ("," ~ variable_possibilites)*)? ~ "]" }
 variable_possibilites = _{ array | string | float | integer }
 
-assignExpr       = { ident ~ "=" ~ variable_possibilites }
-functionCallExpr = { ident ~ "(" ~ (!")" ~ variable_possibilites ~ ("," ~ variable_possibilites)*)? ~ ")" }
+assignExpr         = { ident ~ "=" ~ variable_possibilites }
+updateVariableExpr = { ident ~ "+="+ ~ variable_possibilites }
+functionCallExpr   = { ident ~ "(" ~ (!")" ~ variable_possibilites ~ ("," ~ variable_possibilites)*)? ~ ")" }

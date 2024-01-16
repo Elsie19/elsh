@@ -1,9 +1,10 @@
 use core::fmt;
+use std::ops::Add;
 use std::fs;
 use std::path::PathBuf;
 use std::collections::HashMap;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Type {
     String(String),
     Integer(u32),
@@ -11,12 +12,12 @@ pub enum Type {
     Array(Vec<Type>),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct VariableStatus {
     pub readonly: bool,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum ExportStatus {
     Global,
     Local,
@@ -24,7 +25,7 @@ pub enum ExportStatus {
     Declared,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct ElshLvl(pub i32);
 
 #[derive(Debug)]
@@ -57,6 +58,30 @@ impl fmt::Display for Type {
                     val.iter().map(|x| x.to_string()).collect::<Vec<String>>();
                 write!(f, "{:?}", &array_str_vec)
             }
+        }
+    }
+}
+
+impl Add for Type {
+    type Output = Self;
+
+    fn add(self, to_add: Self) -> Self {
+        match self {
+            Self::String(val) => Type::String(val + &to_add.to_string()),
+            Self::Integer(val) => match to_add {
+                Type::Integer(gotten_to_add) => Type::Integer(val + gotten_to_add),
+                _ => unreachable!("Can't get an int and a nonint")
+            },
+            Self::Float(val) => match to_add {
+                Type::Float(gotten_to_add) => Type::Float(val + gotten_to_add),
+                _ => unreachable!("Can't get a float and a nonfloat")
+            },
+            Self::Array(val) => {
+                    let mut add_array: Vec<Type> = vec![];
+                    add_array.push(Type::Array(val));
+                    add_array.push(to_add);
+                    Type::Array(add_array)
+            },
         }
     }
 }

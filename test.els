@@ -6,4 +6,4 @@ integer=1
 foo="ugh{float}"
 array=[1,'2',['foo','bar']]
 bar="-- {array} --"
-echo("foo")
+array+='1'

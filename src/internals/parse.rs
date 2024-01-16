@@ -39,6 +39,21 @@ pub fn parse_file(path: impl Into<PathBuf> + std::convert::AsRef<std::path::Path
                     },
                 );
             }
+            Rule::updateVariableExpr => {
+                let mut inner_rules = line.into_inner();
+                let variable_name = inner_rules.next().unwrap().as_str();
+                let variable_contents = inner_rules.next().unwrap();
+                let variable_type = parse_value(variable_contents, &elsh_variables);
+                elsh_variables.set(
+                    &variable_name,
+                    Variable {
+                        var_type: elsh_variables.get(&variable_name).unwrap().var_type.clone() + variable_type,
+                        var_status: elsh_variables.get(&variable_name).unwrap().var_status.clone(),
+                        var_export_status: elsh_variables.get(&variable_name).unwrap().var_export_status.clone(),
+                        var_lvl: elsh_variables.get(&variable_name).unwrap().var_lvl.clone(),
+                    },
+                );
+            }
             Rule::functionCallExpr => continue,
             Rule::eoi => println!("{}", "Finished parsing"),
             Rule::newline | Rule::ident | Rule::string => continue,
