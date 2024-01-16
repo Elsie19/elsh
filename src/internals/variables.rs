@@ -1,8 +1,8 @@
 use core::fmt;
-use std::ops::Add;
-use std::fs;
-use std::path::PathBuf;
 use std::collections::HashMap;
+use std::fs;
+use std::ops::Add;
+use std::path::PathBuf;
 
 #[derive(Debug, Clone)]
 pub enum Type {
@@ -42,11 +42,6 @@ pub struct Variables {
     shopts: HashMap<String, bool>,
 }
 
-#[derive(Debug)]
-pub struct Commands {
-    cmds: HashMap<String, PathBuf>,
-}
-
 impl fmt::Display for Type {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
@@ -70,18 +65,18 @@ impl Add for Type {
             Self::String(val) => Type::String(val + &to_add.to_string()),
             Self::Integer(val) => match to_add {
                 Type::Integer(gotten_to_add) => Type::Integer(val + gotten_to_add),
-                _ => unreachable!("Can't get an int and a nonint")
+                _ => unreachable!("Can't get an int and a nonint"),
             },
             Self::Float(val) => match to_add {
                 Type::Float(gotten_to_add) => Type::Float(val + gotten_to_add),
-                _ => unreachable!("Can't get a float and a nonfloat")
+                _ => unreachable!("Can't get a float and a nonfloat"),
             },
             Self::Array(val) => {
-                    let mut add_array: Vec<Type> = vec![];
-                    add_array.push(Type::Array(val));
-                    add_array.push(to_add);
-                    Type::Array(add_array)
-            },
+                let mut add_array: Vec<Type> = vec![];
+                add_array.push(Type::Array(val));
+                add_array.push(to_add);
+                Type::Array(add_array)
+            }
         }
     }
 }
@@ -145,30 +140,5 @@ impl Variables {
 
     pub fn get(&self, key: &str) -> Option<&Variable> {
         self.vars.get(key)
-    }
-}
-
-impl Commands {
-    pub fn new(vars: &Variables) -> Self {
-        let mut setup = Commands {
-            cmds: HashMap::new(),
-        };
-        let paths_from_vars = vars.get("PATH").expect("Something went very wrong and elsh was not initialized with `PATH` array!");
-        let path_directories = match &paths_from_vars.var_type {
-            Type::Array(values) => values.iter().map(|x| x.to_string()).collect::<Vec<String>>(),
-            _ => unreachable!("We are inside PATH matching, so if we don't have an array, we fucked up big time."),
-        };
-        // Loop over every directory we have and collect the files and slap dash them into the
-        // hashmap
-        for directory in path_directories {
-            for file in fs::read_dir(directory).unwrap() {
-                setup.cmds.insert(file.as_ref().unwrap().file_name().into_string().unwrap(), file.unwrap().path());
-            }
-        }
-        setup
-    }
-
-    pub fn get_path(&self, name: String) -> Option<&PathBuf> {
-        self.cmds.get(&name)
     }
 }

@@ -1,5 +1,6 @@
-COMMENT = _{ "#" ~ (!NEWLINE ~ ANY)* ~ NEWLINE }
-program =  { SOI ~ (stmt ~ (newline)*)+ ~ eoi }
+COMMENT    = _{ "#" ~ (!NEWLINE ~ ANY)* ~ NEWLINE }
+WHITESPACE = _{ " " | "\t" }
+program    =  { SOI ~ (stmt ~ (newline)*)+ ~ eoi }
 
 eoi = _{ !ANY }
 
@@ -17,7 +18,7 @@ doublequotes          =  { "\"" ~ ("\"\"" | (!"\"" ~ ANY))* ~ "\"" }
 string                = _{ singlequotes | doublequotes }
 float                 = @{ ASCII_DIGIT* ~ "." ~ ASCII_DIGIT* }
 integer               = @{ ASCII_DIGIT* }
-array                 = ${ "[" ~ (!"]" ~ variable_possibilites ~ ("," ~ variable_possibilites)*)? ~ "]" }
+array                 =  { "[" ~ (!"]" ~ variable_possibilites ~ ("," ~ variable_possibilites)*)? ~ "]" }
 variable_possibilites = _{ array | string | float | integer }
 
 assignExpr         = { ident ~ "=" ~ variable_possibilites }

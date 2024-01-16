@@ -1,6 +1,7 @@
 use crate::internals::variables::VariableStatus;
 
-use super::variables::{ElshLvl, ExportStatus, Type, Variable, Variables, Commands};
+use super::commands::Commands;
+use super::variables::{ElshLvl, ExportStatus, Type, Variable, Variables};
 use pest::iterators::{Pair, Pairs};
 use pest::Parser;
 use pest_derive::Parser;
@@ -18,6 +19,8 @@ pub fn parse_file(path: impl Into<PathBuf> + std::convert::AsRef<std::path::Path
         .expect("Failed parse")
         .next()
         .unwrap();
+
+    dbg!("{}", &file);
 
     let mut elsh_variables = Variables::new();
     let mut commands = Commands::new(&elsh_variables);
@@ -47,9 +50,18 @@ pub fn parse_file(path: impl Into<PathBuf> + std::convert::AsRef<std::path::Path
                 elsh_variables.set(
                     &variable_name,
                     Variable {
-                        var_type: elsh_variables.get(&variable_name).unwrap().var_type.clone() + variable_type,
-                        var_status: elsh_variables.get(&variable_name).unwrap().var_status.clone(),
-                        var_export_status: elsh_variables.get(&variable_name).unwrap().var_export_status.clone(),
+                        var_type: elsh_variables.get(&variable_name).unwrap().var_type.clone()
+                            + variable_type,
+                        var_status: elsh_variables
+                            .get(&variable_name)
+                            .unwrap()
+                            .var_status
+                            .clone(),
+                        var_export_status: elsh_variables
+                            .get(&variable_name)
+                            .unwrap()
+                            .var_export_status
+                            .clone(),
                         var_lvl: elsh_variables.get(&variable_name).unwrap().var_lvl.clone(),
                     },
                 );
