@@ -1,10 +1,12 @@
 use core::fmt;
+use std::fs;
+use std::path::PathBuf;
 use std::collections::HashMap;
 
 #[derive(Debug)]
 pub enum Type {
     String(String),
-    Integer(i32),
+    Integer(u32),
     Float(f32),
     Array(Vec<Type>),
 }
@@ -22,7 +24,7 @@ pub enum ExportStatus {
     Declared,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct ElshLvl(pub i32);
 
 #[derive(Debug)]
@@ -35,9 +37,13 @@ pub struct Variable {
 
 #[derive(Debug)]
 pub struct Variables {
-    /// First String is the variable name, second is the type
     vars: HashMap<String, Variable>,
     shopts: HashMap<String, bool>,
+}
+
+#[derive(Debug)]
+pub struct Commands {
+    cmds: HashMap<String, PathBuf>,
 }
 
 impl fmt::Display for Type {
@@ -64,7 +70,8 @@ impl Variables {
         setup.set(
             "ELSH_VERSION",
             Variable {
-                var_type: Type::String("0.0.1".to_string()),
+                // Set elsh version based on Cargo.toml version
+                var_type: Type::String(env!("CARGO_PKG_VERSION").to_string()),
                 var_status: VariableStatus { readonly: true },
                 var_export_status: ExportStatus::Global,
                 var_lvl: ElshLvl(0),
@@ -113,5 +120,30 @@ impl Variables {
 
     pub fn get(&self, key: &str) -> Option<&Variable> {
         self.vars.get(key)
+    }
+}
+
+impl Commands {
+    pub fn new(vars: &Variables) -> Self {
+        let mut setup = Commands {
+            cmds: HashMap::new(),
+        };
+        let paths_from_vars = vars.get("PATH").expect("Something went very wrong and elsh was not initialized with `PATH` array!");
+        let path_directories = match &paths_from_vars.var_type {
+            Type::Array(values) => values.iter().map(|x| x.to_string()).collect::<Vec<String>>(),
+            _ => unreachable!("We are inside PATH matching, so if we don't have an array, we fucked up big time."),
+        };
+        // Loop over every directory we have and collect the files and slap dash them into the
+        // hashmap
+        for directory in path_directories {
+            for file in fs::read_dir(directory).unwrap() {
+                setup.cmds.insert(file.as_ref().unwrap().file_name().into_string().unwrap(), file.unwrap().path());
+            }
+        }
+        setup
+    }
+
+    pub fn get_path(&self, name: String) -> Option<&PathBuf> {
+        self.cmds.get(&name)
     }
 }

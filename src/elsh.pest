@@ -7,16 +7,17 @@ newline = _{ ";"{1} | NEWLINE }
 
 stmt = _{
     assignExpr
+  | functionCallExpr
 }
 
-ident                  = @{ ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_")* }
-variable_interpolation = @{ "${" ~ ident ~ "}" }
-singlequotes           =  { "'" ~ ("''" | (!"'" ~ ANY))* ~ "'" }
-doublequotes           =  { "\"" ~ ("\"\"" | (!"\"" ~ ANY))* ~ "\"" }
-string                 = _{ singlequotes | doublequotes }
-float                  = @{ ASCII_DIGIT* ~ "." ~ ASCII_DIGIT* }
-integer                = @{ ASCII_DIGIT* }
-array                  = ${ "[" ~ (!"]" ~ variable_possibilites ~ ("," ~ variable_possibilites)*)? ~ "]" }
-variable_possibilites  = _{ array | string | float | integer }
+ident                 = @{ ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_")* }
+singlequotes          =  { "'" ~ ("''" | (!"'" ~ ANY))* ~ "'" }
+doublequotes          =  { "\"" ~ ("\"\"" | (!"\"" ~ ANY))* ~ "\"" }
+string                = _{ singlequotes | doublequotes }
+float                 = @{ ASCII_DIGIT* ~ "." ~ ASCII_DIGIT* }
+integer               = @{ ASCII_DIGIT* }
+array                 = ${ "[" ~ (!"]" ~ variable_possibilites ~ ("," ~ variable_possibilites)*)? ~ "]" }
+variable_possibilites = _{ array | string | float | integer }
 
-assignExpr = { ident ~ "=" ~ variable_possibilites }
+assignExpr       = { ident ~ "=" ~ variable_possibilites }
+functionCallExpr = { ident ~ "(" ~ (!")" ~ variable_possibilites ~ ("," ~ variable_possibilites)*)? ~ ")" }

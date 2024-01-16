@@ -1,6 +1,6 @@
 use crate::internals::variables::VariableStatus;
 
-use super::variables::{ElshLvl, ExportStatus, Type, Variable, Variables};
+use super::variables::{ElshLvl, ExportStatus, Type, Variable, Variables, Commands};
 use pest::iterators::{Pair, Pairs};
 use pest::Parser;
 use pest_derive::Parser;
@@ -20,6 +20,7 @@ pub fn parse_file(path: impl Into<PathBuf> + std::convert::AsRef<std::path::Path
         .unwrap();
 
     let mut elsh_variables = Variables::new();
+    let mut commands = Commands::new(&elsh_variables);
 
     for line in file.into_inner() {
         match line.as_rule() {
@@ -38,6 +39,7 @@ pub fn parse_file(path: impl Into<PathBuf> + std::convert::AsRef<std::path::Path
                     },
                 );
             }
+            Rule::functionCallExpr => continue,
             Rule::eoi => println!("{}", "Finished parsing"),
             Rule::newline | Rule::ident | Rule::string => continue,
             _ => todo!("commands to be run {:?}", line.as_rule()),
