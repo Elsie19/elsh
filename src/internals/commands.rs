@@ -16,8 +16,6 @@ pub struct Command {
     args: Vec<String>,
 }
 
-impl Command {}
-
 impl Commands {
     pub fn new(vars: &Variables) -> Self {
         let mut setup = Commands {

@@ -66,14 +66,23 @@ pub fn parse_file(path: impl Into<PathBuf> + std::convert::AsRef<std::path::Path
                     },
                 );
             }
-            Rule::functionCallExpr => continue,
+            Rule::functionCallExpr => {
+                let mut inner_rules = line.into_inner();
+                let variable_name = inner_rules.next().unwrap().as_str();
+                let variable_contents = inner_rules.map(|x| x);
+                let mut possible_values: Vec<Type> = Vec::new();
+                for i in variable_contents {
+                    possible_values.push(parse_value(i, &elsh_variables));
+                }
+                if !possible_values.is_empty() {
+                    dbg!("{}", possible_values);
+                }
+            }
             Rule::eoi => println!("{}", "Finished parsing"),
             Rule::newline | Rule::ident | Rule::string => continue,
             _ => todo!("commands to be run {:?}", line.as_rule()),
         }
     }
-
-    dbg!("{:?}", elsh_variables);
 }
 
 fn parse_array(lines: Pairs<'_, Rule>, elsh_vars: &Variables) -> Type {
