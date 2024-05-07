@@ -1,4 +1,5 @@
 use crate::internals::variables::ElshLvl;
+use crate::internals::variables::Type;
 
 #[derive(Debug)]
 // This is for internal functions
